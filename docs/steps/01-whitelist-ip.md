@@ -31,6 +31,10 @@ with the Basic load balancer SKU.
 
 ## Starting state
 
+Cluster overview before any hardening:
+
+![AKS cluster aks-lab overview before hardening](images/01-cluster-overview.png)
+
 Azure portal, `aks-lab` > Networking > Resource settings:
 
 ```
@@ -38,6 +42,8 @@ Public access to API server : Enabled
 Load balancer              : standard
 Authorized IP ranges       : Not enabled
 ```
+
+![Networking blade, authorized IP ranges not enabled](images/02-networking-before.png)
 
 Anyone, from any network, can reach the API server endpoint.
 
@@ -65,8 +71,12 @@ The value must be written in **CIDR notation**. A single address is a `/32`:
 <ADMIN_IP>/32
 ```
 
+![Looking up the public egress address on mon-ip.com](images/03-find-public-ip.png)
+
 > The real address used during the lab is intentionally not committed to this
 > repository, which is public. Keep it in a local variable or a private note.
+> For the same reason, the address and the subscription id are masked in the
+> screenshots of this page.
 
 ## Procedure
 
@@ -77,6 +87,8 @@ The value must be written in **CIDR notation**. A single address is a `/32`:
 3. Tick **Set authorized IP ranges**.
 4. Enter the CIDR, one per line.
 5. Click **Save**.
+
+![Authorized IP ranges panel with the allowed CIDR](images/04-authorized-ip-ranges.png)
 
 ### Azure CLI, equivalent
 
@@ -122,6 +134,8 @@ Observed result:
 NAME                                STATUS   ROLES    AGE   VERSION
 aks-nodepool1-22164361-vmss000000   Ready    <none>   30m   v1.35.7
 ```
+
+![kubectl get nodes returning the cluster node](images/05-verification-kubectl.png)
 
 Then the negative test, from a different network such as a phone hotspot. The
 same command must fail with a timeout. This second test is what actually proves
