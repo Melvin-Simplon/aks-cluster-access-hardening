@@ -1,0 +1,32 @@
+# Minimal pod proving the exchange works, with no secret anywhere in the spec.
+#
+# The label is mandatory: only labelled pods are mutated by the webhook that
+# injects the Azure environment variables and the projected token volume. A pod
+# without it starts fine and then fails to authenticate, which is a confusing
+# way to lose an afternoon.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: workload-identity-demo
+  namespace: prod
+  labels:
+    azure.workload.identity/use: "true"
+spec:
+  serviceAccountName: prod-app
+  restartPolicy: Never
+  containers:
+    - name: azcli
+      image: mcr.microsoft.com/azure-cli:latest
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          echo "client id  : $AZURE_CLIENT_ID"
+          echo "tenant id  : $AZURE_TENANT_ID"
+          echo "token file : $AZURE_FEDERATED_TOKEN_FILE"
+          az login --service-principal \
+            --username "$AZURE_CLIENT_ID" \
+            --tenant "$AZURE_TENANT_ID" \
+            --federated-token "$(cat "$AZURE_FEDERATED_TOKEN_FILE")" \
+            --output none
+          echo "signed in to Azure with no secret"
+          az account show --output table
