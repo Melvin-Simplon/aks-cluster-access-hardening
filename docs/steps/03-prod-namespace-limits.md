@@ -106,8 +106,8 @@ spec:
 
 ## Why these values
 
-The lab cluster is a single `Standard_B2s` node, 2 vCPU and 4 GiB, of which
-roughly 1.5 GiB is reserved by the system.
+The lab cluster is a single `Standard_D2_v3` node, 2 vCPU and 8 GiB, part of
+which is reserved by the system and unavailable to workloads.
 
 The quota is set slightly below that capacity on requests, so that a pod
 accepted by the quota also has a realistic chance of being scheduled. A quota

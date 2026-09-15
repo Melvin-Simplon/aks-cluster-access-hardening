@@ -1,0 +1,10 @@
+# IDE
+.idea/
+.vscode/
+
+# Local configuration, may hold environment specific values
+scripts/config.env
+
+# Kubernetes credentials, never commit these
+kubeconfig
+*.kubeconfig
