@@ -31,6 +31,8 @@ make one-shot        # apply every step, confirming once
 make check-up        # assert the expected posture, non-zero exit if not
 ```
 
+![make help listing every target](docs/images/make-help.png)
+
 `make setup` runs the same steps one by one, confirming each. Add `DRY_RUN=1` to
 print the commands without applying them, or `LOG_FILE=logs/run.log` to keep a
 timestamped transcript.
@@ -44,6 +46,7 @@ and ask.
 ```
 docs/consignes/   the mission statement
 docs/steps/       one runbook per step, with screenshots
+docs/images/      the screenshots used by this readme
 k8s/              the manifests applied to the cluster
 scripts/          one script per step, plus status and check
 Makefile          the entry point
