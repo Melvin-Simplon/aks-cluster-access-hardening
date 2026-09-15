@@ -10,6 +10,8 @@ source "$(dirname "${BASH_SOURCE[0]}")/lib/common.sh"
 SECTION_COLORS="Setup=38;5;220,Hardening=38;5;170,Verification=38;5;39,Help=38;5;80"
 DEFAULT_COLOR="38;5;80"
 BANNER_COLOR="38;5;141"
+HEADER_COLOR="38;5;208"
+WARNING_COLOR="38;5;196"
 
 # Sections follow the include order of the Makefile, not the alphabet.
 # Includes that do not resolve to a readable file are skipped, so a conditional
@@ -49,22 +51,26 @@ print_targets() {
 banner() {
   printf '\033[1;%sm\n' "${BANNER_COLOR}"
   cat <<'BANNER'
-  ___ ___                  .___            .__                    _____   ____  __.  _________
- /   |   \_____ _______  __| _/____   ____ |__| ____    ____     /  _  \ |    |/ _| /   _____/
-/    ~    \__  \\_  __ \/ __ |/ __ \ /    \|  |/    \  / ___\   /  /_\  \|      <   \_____  \ 
-\    Y    // __ \|  | \/ /_/ \  ___/|   |  \  |   |  \/ /_/  > /    |    \    |  \  /        \
- \___|_  /(____  /__|  \____ |\___  >___|  /__|___|  /\___  /  \____|__  /____|__ \/_______  /
-       \/      \/           \/    \/     \/        \//_____/           \/        \/        \/
+██  ██  ▄▄▄  ▄▄▄▄  ▄▄▄▄  ▄▄▄▄▄ ▄▄  ▄▄ ▄▄ ▄▄  ▄▄  ▄▄▄▄   ▄████▄ ██ ▄█▀ ▄█████
+██████ ██▀██ ██▄█▄ ██▀██ ██▄▄  ███▄██ ██ ███▄██ ██ ▄▄   ██▄▄██ ████   ▀▀▀▄▄▄
+██  ██ ██▀██ ██ ██ ████▀ ██▄▄▄ ██ ▀██ ██ ██ ▀██ ▀███▀   ██  ██ ██ ▀█▄ █████▀
+
 BANNER
   printf '\033[0m\n'
 }
 
+
+say() { printf '\033[%sm%s\033[0m\n' "$1" "$2"; }
+
 main() {
+  clear
   banner
-  echo "AKS cluster access hardening"
+  say "$HEADER_COLOR" "AKS cluster access hardening"
   echo
-  echo "Usage: make <target> [DRY_RUN=1] [ASSUME_YES=1]"
-  echo "DRY_RUN prints the commands without applying them, ASSUME_YES skips the prompts."
+  say "$HEADER_COLOR" "Usage: make <target> [DRY_RUN=1] [ASSUME_YES=1]"
+  say "$HEADER_COLOR" "DRY_RUN prints the commands without applying them, ASSUME_YES skips the prompts."
+  echo
+  say "1;$WARNING_COLOR" "⚠️ Use only on authorized targets"
   mapfile -t files < <(makefiles)
   print_targets "${files[@]}"
   echo
