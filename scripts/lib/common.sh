@@ -94,6 +94,7 @@ group_id() {
     az ad group show --group "$1" --query id -o tsv 2>/dev/null || true
 }
 
-repo_root() {
-    cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd
-}
+PROJECT_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
+export PROJECT_ROOT
+
+repo_root() { printf '%s' "${PROJECT_ROOT}"; }
