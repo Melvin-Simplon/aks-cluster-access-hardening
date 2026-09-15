@@ -28,28 +28,51 @@ die() {
 
 # --------------------------------------------------------------- logging ----
 
+# Bash only keeps one EXIT trap, so a plain `trap ... EXIT` silently replaces
+# whatever a script installed before. Chain instead of overwrite.
+add_exit_trap() {
+    local new_cmd="$1" existing
+    existing=$(trap -p EXIT | sed -n "s/^trap -- '\\(.*\\)' EXIT$/\\1/p")
+    # Expanding now is the point: the trap string is composed here, not later.
+    # shellcheck disable=SC2064
+    if [[ -n "${existing}" ]]; then
+        trap "${existing}; ${new_cmd}" EXIT
+    else
+        trap "${new_cmd}" EXIT
+    fi
+}
+
+# Strips the ANSI escapes and stamps every line, so the file stays readable and
+# can be correlated with an incident. Reads from stdin, appends to LOG_FILE.
+log_sink() {
+    sed -u 's/\x1b\[[0-9;]*[a-zA-Z]//g' | while IFS= read -r line; do
+        printf '%s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "${line}"
+    done >>"${LOG_FILE}"
+}
+
 # When LOG_FILE is set, everything the script prints is also appended there,
-# with the ANSI escapes stripped so the file stays readable and pasteable.
-# Terminal output keeps its colours, and stdout and stderr stay separate.
+# timestamped and without escapes. Terminal output keeps its colours, and
+# stdout and stderr stay separate.
 init_log() {
     [[ -n "${LOG_FILE:-}" ]] || return 0
 
-    local dir strip
+    local dir
     dir=$(dirname "${LOG_FILE}")
     [[ -d "${dir}" ]] || mkdir -p "${dir}"
 
-    {
-        printf '===== %s  %s =====\n' \
-            "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(basename "${0}")"
-    } >>"${LOG_FILE}"
+    # An operations journal is not world readable.
+    ( umask 077; : >>"${LOG_FILE}" )
+    chmod 600 "${LOG_FILE}" 2>/dev/null || true
 
-    strip='s/\x1b\[[0-9;]*[a-zA-Z]//g'
-    exec  > >(tee >(sed -u "${strip}" >>"${LOG_FILE}")) \
-         2> >(tee >(sed -u "${strip}" >>"${LOG_FILE}") >&2)
+    printf -- '---- run %s | %s | pid %s ----\n' \
+        "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(basename "${0}")" "$$" >>"${LOG_FILE}"
 
-    # Let the tee subprocesses drain before the shell goes away, otherwise the
-    # tail of the run can be missing from the file.
-    trap 'exec 1>&-; exec 2>&-; wait' EXIT
+    exec  > >(tee >(log_sink)) \
+         2> >(tee >(log_sink) >&2)
+
+    # Let the sinks drain before the shell goes away, otherwise the tail of the
+    # run is missing from the file.
+    add_exit_trap 'exec 1>&-; exec 2>&-; wait'
 }
 
 # ---------------------------------------------------------------- guards ----
