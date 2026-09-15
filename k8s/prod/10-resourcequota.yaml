@@ -1,0 +1,19 @@
+# Ceiling for the namespace as a whole.
+#
+# Once a quota constrains cpu or memory, the API server REJECTS any pod that
+# does not declare the matching requests and limits. The LimitRange next to this
+# file supplies those values by default, so existing manifests keep working.
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: prod-quota
+  namespace: prod
+spec:
+  hard:
+    requests.cpu: "1"
+    requests.memory: 2Gi
+    limits.cpu: "2"
+    limits.memory: 4Gi
+    pods: "20"
+    persistentvolumeclaims: "5"
+    services.loadbalancers: "2"
