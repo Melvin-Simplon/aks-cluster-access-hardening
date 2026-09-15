@@ -10,14 +10,16 @@ set -euo pipefail
 # shellcheck source=scripts/lib/common.sh
 source "$(dirname "${BASH_SOURCE[0]}")/lib/common.sh"
 
+# Returns the group object id on stdout, so every message it emits has to go to
+# stderr. Otherwise the logs end up inside the caller's variable.
 ensure_group() {
     local name="$1" id
     id=$(group_id "${name}")
     if [[ -n "${id}" ]]; then
-        log_ok "group '${name}' exists (${id})"
+        log_ok "group '${name}' exists (${id})" >&2
     else
-        log_info "creating group '${name}'"
-        run az ad group create --display-name "${name}" --mail-nickname "${name}" --output none
+        log_info "creating group '${name}'" >&2
+        run az ad group create --display-name "${name}" --mail-nickname "${name}" --output none >&2
         id=$(group_id "${name}")
     fi
     printf '%s' "${id}"

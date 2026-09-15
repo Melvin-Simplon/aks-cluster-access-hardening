@@ -19,7 +19,7 @@ endif
 
 SCRIPTS := scripts
 
-.PHONY: help setup status check-up step-1 step-2 step-3 step-4 config lint
+.PHONY: help one-shot setup status check-up step-1 step-2 step-3 step-4 config lint
 
 ##@ Help
 
@@ -34,7 +34,10 @@ config: ## Create scripts/config.env from the example
 
 ##@ Hardening
 
-setup: step-1 step-2 step-3 step-4 ## Run every hardening step in order
+one-shot: ## Run every step in one go, confirming once instead of at each step
+	@$(SCRIPTS)/one-shot.sh
+
+setup: step-1 step-2 step-3 step-4 ## Run the steps one by one, confirming each
 	@echo
 	@echo "setup complete, run 'make check-up' to verify"
 
