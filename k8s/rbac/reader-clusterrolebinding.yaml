@@ -1,0 +1,24 @@
+# Grants cluster-wide read-only access to the Entra ID "readers" group.
+#
+# The subject name must be the GROUP OBJECT ID, not the display name. The
+# placeholder is resolved at apply time so that no tenant identifier is stored
+# in this public repository:
+#
+#   READER_ID=$(az ad group show --group aks-lab-reader --query id -o tsv)
+#   sed "s/__READER_GROUP_OBJECT_ID__/$READER_ID/" \
+#     k8s/rbac/reader-clusterrolebinding.yaml | kubectl apply -f -
+#
+# "view" is a built-in Kubernetes ClusterRole: read access to most namespaced
+# resources, excluding Secrets and excluding role/rolebinding definitions.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: aks-lab-reader-view
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: view
+subjects:
+  - apiGroup: rbac.authorization.k8s.io
+    kind: Group
+    name: __READER_GROUP_OBJECT_ID__
