@@ -66,8 +66,9 @@ main() {
   banner
   say "$BANNER_COLOR" "  AKS cluster access hardening"
   echo
-  say "$HEADER_COLOR" "Usage: make <target> [DRY_RUN=1] [ASSUME_YES=1]"
+  say "$HEADER_COLOR" "Usage: make <target> [DRY_RUN=1] [ASSUME_YES=1] [LOG_FILE=path]"
   say "$HEADER_COLOR" "DRY_RUN prints the commands without applying them, ASSUME_YES skips the prompts."
+  say "$HEADER_COLOR" "LOG_FILE also appends a colourless transcript of the run to that file."
   echo
   say "1;$WARNING_COLOR" "⚠️ Use only on authorized targets"
   mapfile -t files < <(makefiles)

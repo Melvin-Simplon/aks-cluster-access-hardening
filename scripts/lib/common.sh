@@ -26,6 +26,32 @@ die() {
     exit 1
 }
 
+# --------------------------------------------------------------- logging ----
+
+# When LOG_FILE is set, everything the script prints is also appended there,
+# with the ANSI escapes stripped so the file stays readable and pasteable.
+# Terminal output keeps its colours, and stdout and stderr stay separate.
+init_log() {
+    [[ -n "${LOG_FILE:-}" ]] || return 0
+
+    local dir strip
+    dir=$(dirname "${LOG_FILE}")
+    [[ -d "${dir}" ]] || mkdir -p "${dir}"
+
+    {
+        printf '===== %s  %s =====\n' \
+            "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(basename "${0}")"
+    } >>"${LOG_FILE}"
+
+    strip='s/\x1b\[[0-9;]*[a-zA-Z]//g'
+    exec  > >(tee >(sed -u "${strip}" >>"${LOG_FILE}")) \
+         2> >(tee >(sed -u "${strip}" >>"${LOG_FILE}") >&2)
+
+    # Let the tee subprocesses drain before the shell goes away, otherwise the
+    # tail of the run can be missing from the file.
+    trap 'exec 1>&-; exec 2>&-; wait' EXIT
+}
+
 # ---------------------------------------------------------------- guards ----
 
 require_cmd() {
@@ -98,3 +124,5 @@ PROJECT_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 export PROJECT_ROOT
 
 repo_root() { printf '%s' "${PROJECT_ROOT}"; }
+
+init_log

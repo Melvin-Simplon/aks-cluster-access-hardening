@@ -8,3 +8,4 @@ scripts/config.env
 # Kubernetes credentials, never commit these
 kubeconfig
 *.kubeconfig
+logs/
