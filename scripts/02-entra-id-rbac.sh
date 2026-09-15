@@ -51,17 +51,32 @@ main() {
         fi
     fi
 
+    # Azure rejects --enable-aad on a cluster where managed Entra ID is already
+    # on, so the flag is only passed the first time. Afterwards the admin group
+    # is updated on its own, and only when it actually differs.
     log_step "Enabling Entra ID integration"
     if [[ "$(aks_query 'aadProfile.managed')" == "true" ]]; then
         log_ok "already enabled"
+        if [[ "$(aks_query 'aadProfile.adminGroupObjectIDs')" == *"${admin_id}"* ]]; then
+            log_ok "admin group already declared on the cluster"
+        else
+            log_info "declaring '${ADMIN_GROUP}' as the cluster admin group"
+            run az aks update \
+                --resource-group "${RESOURCE_GROUP}" \
+                --name "${CLUSTER_NAME}" \
+                --aad-admin-group-object-ids "${admin_id}" \
+                --only-show-errors \
+                --output none
+        fi
+    else
+        run az aks update \
+            --resource-group "${RESOURCE_GROUP}" \
+            --name "${CLUSTER_NAME}" \
+            --enable-aad \
+            --aad-admin-group-object-ids "${admin_id}" \
+            --only-show-errors \
+            --output none
     fi
-    run az aks update \
-        --resource-group "${RESOURCE_GROUP}" \
-        --name "${CLUSTER_NAME}" \
-        --enable-aad \
-        --aad-admin-group-object-ids "${admin_id}" \
-        --only-show-errors \
-        --output none
 
     log_step "Binding the readers group to the view ClusterRole"
     local manifest

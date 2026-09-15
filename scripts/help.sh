@@ -51,12 +51,11 @@ print_targets() {
 banner() {
   printf '\033[1;%sm\n' "${BANNER_COLOR}"
   cat <<'BANNER'
-██  ██  ▄▄▄  ▄▄▄▄  ▄▄▄▄  ▄▄▄▄▄ ▄▄  ▄▄ ▄▄ ▄▄  ▄▄  ▄▄▄▄   ▄████▄ ██ ▄█▀ ▄█████
-██████ ██▀██ ██▄█▄ ██▀██ ██▄▄  ███▄██ ██ ███▄██ ██ ▄▄   ██▄▄██ ████   ▀▀▀▄▄▄
-██  ██ ██▀██ ██ ██ ████▀ ██▄▄▄ ██ ▀██ ██ ██ ▀██ ▀███▀   ██  ██ ██ ▀█▄ █████▀
+  ██  ██  ▄▄▄  ▄▄▄▄  ▄▄▄▄  ▄▄▄▄▄ ▄▄  ▄▄ ▄▄ ▄▄  ▄▄  ▄▄▄▄   ▄████▄ ██ ▄█▀ ▄█████
+  ██████ ██▀██ ██▄█▄ ██▀██ ██▄▄  ███▄██ ██ ███▄██ ██ ▄▄   ██▄▄██ ████   ▀▀▀▄▄▄
+  ██  ██ ██▀██ ██ ██ ████▀ ██▄▄▄ ██ ▀██ ██ ██ ▀██ ▀███▀   ██  ██ ██ ▀█▄ █████▀
 
 BANNER
-  printf '\033[0m\n'
 }
 
 
@@ -65,7 +64,7 @@ say() { printf '\033[%sm%s\033[0m\n' "$1" "$2"; }
 main() {
   clear
   banner
-  say "$HEADER_COLOR" "AKS cluster access hardening"
+  say "$BANNER_COLOR" "  AKS cluster access hardening"
   echo
   say "$HEADER_COLOR" "Usage: make <target> [DRY_RUN=1] [ASSUME_YES=1]"
   say "$HEADER_COLOR" "DRY_RUN prints the commands without applying them, ASSUME_YES skips the prompts."
