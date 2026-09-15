@@ -9,6 +9,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/lib/common.sh"
 # One colour per section. Unlisted sections fall back to DEFAULT_COLOR.
 SECTION_COLORS="Setup=38;5;220,Hardening=38;5;170,Verification=38;5;39,Help=38;5;80"
 DEFAULT_COLOR="38;5;80"
+BANNER_COLOR="38;5;141"
 
 # Sections follow the include order of the Makefile, not the alphabet.
 # Includes that do not resolve to a readable file are skipped, so a conditional
@@ -44,7 +45,22 @@ print_targets() {
   ' "$@"
 }
 
+# Quoted heredoc, so the backslashes of the figlet art survive untouched.
+banner() {
+  printf '\033[1;%sm\n' "${BANNER_COLOR}"
+  cat <<'BANNER'
+  ___ ___                  .___            .__                    _____   ____  __.  _________
+ /   |   \_____ _______  __| _/____   ____ |__| ____    ____     /  _  \ |    |/ _| /   _____/
+/    ~    \__  \\_  __ \/ __ |/ __ \ /    \|  |/    \  / ___\   /  /_\  \|      <   \_____  \ 
+\    Y    // __ \|  | \/ /_/ \  ___/|   |  \  |   |  \/ /_/  > /    |    \    |  \  /        \
+ \___|_  /(____  /__|  \____ |\___  >___|  /__|___|  /\___  /  \____|__  /____|__ \/_______  /
+       \/      \/           \/    \/     \/        \//_____/           \/        \/        \/
+BANNER
+  printf '\033[0m\n'
+}
+
 main() {
+  banner
   echo "AKS cluster access hardening"
   echo
   echo "Usage: make <target> [DRY_RUN=1] [ASSUME_YES=1]"
